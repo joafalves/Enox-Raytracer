@@ -8,11 +8,14 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.IO;
 
 namespace Enox.WinForms
 {
     public partial class MainWindow : Form
     {
+        private Scene myScene = new Scene();
+
         public MainWindow()
         {
             InitializeComponent();          
@@ -69,5 +72,31 @@ namespace Enox.WinForms
         {
 
         }
+
+        private void loadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            
+            if(ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK && ofd.FileName != string.Empty) {
+                var fileContent = File.ReadAllText(ofd.FileName, Encoding.UTF8);
+                fileContent = fileContent.ToLower().Replace("\r", string.Empty).Replace("\t", string.Empty);
+                var splitted = fileContent.Split('}');
+                foreach (var split in splitted)
+                {
+                    var innerSplit = split.Split('{');
+                    var name = innerSplit[0].Trim();
+                  
+                    switch(name)
+                    {
+                        case "camera":
+                            Camera camera = Camera.FromString(innerSplit[1]);
+                            myScene.Cameras.Add(camera);
+                            break;
+                    }
+                }
+            }            
+        }
+
+
     }
 }

@@ -30,15 +30,15 @@
         {
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.sceneViewTab = new System.Windows.Forms.TabPage();
+            this.sceneViewGLControl = new OpenTK.GLControl();
             this.renderViewTab = new System.Windows.Forms.TabPage();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.sceneViewGLControl = new OpenTK.GLControl();
             this.loadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl1.SuspendLayout();
             this.sceneViewTab.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -66,12 +66,22 @@
             this.sceneViewTab.Text = "Scene View";
             this.sceneViewTab.UseVisualStyleBackColor = true;
             // 
+            // sceneViewGLControl
+            // 
+            this.sceneViewGLControl.BackColor = System.Drawing.Color.Black;
+            this.sceneViewGLControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.sceneViewGLControl.Location = new System.Drawing.Point(3, 3);
+            this.sceneViewGLControl.Name = "sceneViewGLControl";
+            this.sceneViewGLControl.Size = new System.Drawing.Size(594, 375);
+            this.sceneViewGLControl.TabIndex = 0;
+            this.sceneViewGLControl.VSync = false;
+            // 
             // renderViewTab
             // 
             this.renderViewTab.Location = new System.Drawing.Point(4, 22);
             this.renderViewTab.Name = "renderViewTab";
             this.renderViewTab.Padding = new System.Windows.Forms.Padding(3);
-            this.renderViewTab.Size = new System.Drawing.Size(599, 378);
+            this.renderViewTab.Size = new System.Drawing.Size(600, 381);
             this.renderViewTab.TabIndex = 1;
             this.renderViewTab.Text = "Render View";
             this.renderViewTab.UseVisualStyleBackColor = true;
@@ -99,27 +109,12 @@
             this.toolStripMenuItem1.Size = new System.Drawing.Size(40, 20);
             this.toolStripMenuItem1.Text = " &File";
             // 
-            // toolsToolStripMenuItem
-            // 
-            this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
-            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(51, 20);
-            this.toolsToolStripMenuItem.Text = " &Tools";
-            // 
-            // sceneViewGLControl
-            // 
-            this.sceneViewGLControl.BackColor = System.Drawing.Color.Black;
-            this.sceneViewGLControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.sceneViewGLControl.Location = new System.Drawing.Point(3, 3);
-            this.sceneViewGLControl.Name = "sceneViewGLControl";
-            this.sceneViewGLControl.Size = new System.Drawing.Size(594, 375);
-            this.sceneViewGLControl.TabIndex = 0;
-            this.sceneViewGLControl.VSync = false;
-            // 
             // loadToolStripMenuItem
             // 
             this.loadToolStripMenuItem.Name = "loadToolStripMenuItem";
             this.loadToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.loadToolStripMenuItem.Text = "Load";
+            this.loadToolStripMenuItem.Click += new System.EventHandler(this.loadToolStripMenuItem_Click);
             // 
             // saveToolStripMenuItem
             // 
@@ -138,14 +133,20 @@
             this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             // 
-            // Form1
+            // toolsToolStripMenuItem
+            // 
+            this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
+            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(51, 20);
+            this.toolsToolStripMenuItem.Text = " &Tools";
+            // 
+            // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(608, 431);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.menuStrip1);
-            this.Name = "Form1";
+            this.Name = "MainWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Ray Tracing";
             this.tabControl1.ResumeLayout(false);
