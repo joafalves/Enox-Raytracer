@@ -50,17 +50,11 @@ namespace Enox.Framework
 
         #endregion
 
-        #region constructors
+        #region methods
 
         public static Camera FromString(string content)
         {
             var lines = content.Trim().Split('\n');
-
-            foreach (var line in lines)
-            {
-                var lineSplit = line.Split(' ');
-
-            }
 
             float distance = (float)Convert.ToDecimal(lines[0]);
             float fieldOfView = (float)Convert.ToDecimal(lines[1]);
@@ -73,7 +67,7 @@ namespace Enox.Framework
 
             float horizontal = 0;
             float vertical = 0;
-            if (lines.Count() > 3)
+            if (lines.Count() > 3) // since it's optional, this is important!
             {
                 horizontal = (float)Convert.ToDecimal(lines[3].Split(' ')[0]);
                 vertical = (float)Convert.ToDecimal(lines[3].Split(' ')[1]);
@@ -88,6 +82,11 @@ namespace Enox.Framework
                 vertical = vertical
             };
         }
+
+        //public override string ToString()
+        //{
+        //    return string.Format("Position: {0}\n")
+        //}
 
         #endregion
     }

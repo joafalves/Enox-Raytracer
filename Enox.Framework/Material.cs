@@ -65,5 +65,38 @@ namespace Enox.Framework
         }
 
         #endregion
+
+        #region methods
+
+        public static Material FromString(string content)
+        {
+            var lines = content.Trim().Split('\n');
+
+            var split = lines[0].Split(' ');
+            float red = (float)Convert.ToDecimal(split[0]);
+            float green = (float)Convert.ToDecimal(split[1]);
+            float blue = (float)Convert.ToDecimal(split[2]);
+
+            split = lines[1].Split(' ');
+            float ambient = (float)Convert.ToDecimal(split[0]);
+            float diffuse = (float)Convert.ToDecimal(split[1]);
+            float reflection = (float)Convert.ToDecimal(split[2]);
+            float refractionCoef = (float)Convert.ToDecimal(split[3]);
+            float refractionIndex = (float)Convert.ToDecimal(split[4]);
+
+            return new Material()
+            {
+                r = red,
+                g = green,
+                b = blue,
+                ambient = ambient,
+                diffuse = diffuse,
+                reflection = reflection,
+                refractionCoef = refractionCoef,
+                refractionIndex = refractionIndex
+            };
+        }
+
+        #endregion
     }
 }

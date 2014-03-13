@@ -10,7 +10,7 @@ namespace Enox.Framework
         #region fields
 
         private int materialIndex;
-        private List<Vector3> vertices = new List<Vector3>(); 
+        private List<Triangle> triangles = new List<Triangle>();
 
         #endregion
 
@@ -22,10 +22,62 @@ namespace Enox.Framework
             set { materialIndex = value; }
         }
 
-        public List<Vector3> Vertices
+        public List<Triangle> Triangles
         {
-            get { return vertices; }
-            set { vertices = value; }
+            get { return triangles; }
+            set { triangles = value; }
+        }
+
+        #endregion
+
+        #region methods
+
+        public static Solid FromString(string content)
+        {
+            var lines = content.Trim().Split('\n');
+
+            int c = 0;
+            Triangle t = new Triangle();
+            List<Triangle> triangles = new List<Triangle>();
+            for (int i = 0; i < lines.Count(); i++)
+            {
+                if (c > 3)
+                {
+                    c = 0;
+
+                    Vector3 u = t.Points[1] - t.Points[0];
+                    Vector3 v = t.Points[2] - t.Points[0];
+                    t.Normal = u * v;
+
+                    triangles.Add(t);
+
+                 
+                }
+
+                if (c == 0)
+                {
+                    t = new Triangle();
+                    t.MaterialIndex = (int)Convert.ToDecimal(lines[i]);
+                    t.Points = new Vector3[3];
+                }
+                else
+                {
+                    var split = lines[i].Split(' ');
+                    t.Points[c - 1] = new Vector3()
+                    {
+                        X = (float)Convert.ToDecimal(split[0]),
+                        Y = (float)Convert.ToDecimal(split[1]),
+                        Z = (float)Convert.ToDecimal(split[2])
+                    };
+                }
+
+                c++;
+            }
+
+            return new Solid()
+            {
+                triangles = triangles
+            };
         }
 
         #endregion

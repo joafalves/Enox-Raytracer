@@ -62,5 +62,32 @@ namespace Enox.Framework
         }
 
         #endregion
+
+        #region methods
+
+        public static Image FromString(string content)
+        {
+            var lines = content.Trim().Split('\n');
+
+
+            float horizontal = (float)Convert.ToDecimal(lines[0].Split(' ')[0]);
+            float vertical = (float)Convert.ToDecimal(lines[0].Split(' ')[0]);
+            
+            var split = lines[1].Split(' ');
+            float red = (float)Convert.ToDecimal(split[0]);
+            float green = (float)Convert.ToDecimal(split[1]);
+            float blue = (float)Convert.ToDecimal(split[2]);
+
+            return new Image()
+            {
+                horizontal = (int)horizontal,
+                vertical = (int)vertical,
+                r = red,
+                g = green,
+                b = blue
+            };
+        }
+
+        #endregion
     }
 }
