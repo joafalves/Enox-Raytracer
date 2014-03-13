@@ -12,7 +12,7 @@ namespace Enox.Framework
         private float distance, fieldOfView, horizontal, vertical;
         private Vector3 position;
 
-       
+
 
         #endregion
 
@@ -59,12 +59,33 @@ namespace Enox.Framework
             foreach (var line in lines)
             {
                 var lineSplit = line.Split(' ');
+
+            }
+
+            float distance = (float)Convert.ToDecimal(lines[0]);
+            float fieldOfView = (float)Convert.ToDecimal(lines[1]);
+            Vector3 position = new Vector3()
+            {
+                X = (float)Convert.ToDecimal(lines[2].Split(' ')[0]),
+                Y = (float)Convert.ToDecimal(lines[2].Split(' ')[1]),
+                Z = (float)Convert.ToDecimal(lines[2].Split(' ')[2])
+            };
+
+            float horizontal = 0;
+            float vertical = 0;
+            if (lines.Count() > 3)
+            {
+                horizontal = (float)Convert.ToDecimal(lines[3].Split(' ')[0]);
+                vertical = (float)Convert.ToDecimal(lines[3].Split(' ')[1]);
             }
 
             return new Camera()
             {
-
-
+                distance = distance,
+                fieldOfView = fieldOfView,
+                position = position,
+                horizontal = horizontal,
+                vertical = vertical
             };
         }
 

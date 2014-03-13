@@ -56,14 +56,14 @@ namespace Enox.WinForms
 
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
-            GL.LineWidth(4);
-            GL.Begin(PrimitiveType.Lines);
-            {
-                GL.Color4(1.0f, 1.0f, 1.0f, 1.0f);
-                GL.Vertex2(0, 100);
-                GL.Vertex2(600, 100);
-            }
-            GL.End();
+            //GL.LineWidth(4);
+            //GL.Begin(PrimitiveType.Lines);
+            //{
+            //    GL.Color4(1.0f, 1.0f, 1.0f, 1.0f);
+            //    GL.Vertex2(0, 100);
+            //    GL.Vertex2(600, 100);
+            //}
+            //GL.End();
 
             sceneViewGLControl.SwapBuffers();
         }
@@ -79,7 +79,7 @@ namespace Enox.WinForms
             
             if(ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK && ofd.FileName != string.Empty) {
                 var fileContent = File.ReadAllText(ofd.FileName, Encoding.UTF8);
-                fileContent = fileContent.ToLower().Replace("\r", string.Empty).Replace("\t", string.Empty);
+                fileContent = fileContent.ToLower().Replace("\r", string.Empty).Replace("\t", string.Empty).Replace(".", ",");
                 var splitted = fileContent.Split('}');
                 foreach (var split in splitted)
                 {
