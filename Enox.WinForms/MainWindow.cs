@@ -128,6 +128,12 @@ namespace Enox.WinForms
                             Vector3 df = new Vector3(px, py, 0) - origin;
                             Vector3 direction = Vector3.Normalize(df);
 
+                            Ray r = new Ray()
+                            {
+                                Direction = direction,
+                                Origin = origin
+                            };
+
 #if DEBUG
                             if (i < 10 && y < 10)
                             {
