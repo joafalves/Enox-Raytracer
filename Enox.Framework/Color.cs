@@ -59,6 +59,11 @@ namespace Enox.Framework
             this.a = a;
         }
 
+        public override string ToString()
+        {
+            return string.Format("[r:{0},g:{1},b:{2},a:{3}]", r, g, b, a);
+        }
+
         #endregion
     }
 }

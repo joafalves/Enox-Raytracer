@@ -29,6 +29,11 @@ namespace Enox.Framework
 
         #region methods
 
+        public static float Dot(Vector3 a, Vector3 b)
+        {
+            return b.X * a.X + b.Y * a.Y + b.Z * a.Z;
+        }
+
         public float Dot(Vector3 b)
         {
             return b.X * X + b.Y * Y + b.Z * Z;

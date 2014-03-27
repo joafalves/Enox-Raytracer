@@ -100,6 +100,9 @@ namespace Enox.WinForms
             {
                 try
                 {
+                    Bitmap bmp = new Bitmap(myScene.Images[0].Horizontal, myScene.Images[0].Vertical);
+                    //byte[] colorArray = new byte[myScene.Images[0].Horizontal * myScene.Images[0].Vertical];
+
                     float height = 2 * myScene.Cameras[0].Distance *
                                (float)Math.Tan((myScene.Cameras[0].FieldOfView * (Math.PI / 180.0f)) / 2);
                     float width = myScene.Images[0].Horizontal / myScene.Images[0].Vertical * height;
@@ -109,7 +112,7 @@ namespace Enox.WinForms
                     Vector3 origin = new Vector3(0, 0, myScene.Cameras[0].Distance);
 
                     //MessageBox.Show(height.ToString() + "::" + width.ToString() + "::" + pixelSize);
-
+                    int colorCounter = 0;
                     for (int i = 0; i < myScene.Images[0].Horizontal; i++)
                     {
                         for (int y = 0; y < myScene.Images[0].Vertical; y++)
@@ -124,6 +127,7 @@ namespace Enox.WinForms
                             // py = pixelSize * (y + 0.5f) - (height/2)
                             // pz = 0
 
+
                             float px = pixelSize * (i + 0.5f) - (width / 2);
                             float py = pixelSize * (y + 0.5f) - (height / 2);
                             Vector3 df = new Vector3(px, py, 0) - origin;
@@ -135,14 +139,22 @@ namespace Enox.WinForms
                                 Origin = origin
                             };
 
+                            Enox.Framework.Color c = Ray.Trace(myScene, r, 2);
+
+                            bmp.SetPixel(i, y, 
+                                System.Drawing.Color.FromArgb((int)(255), (int)(c.R * 255), 
+                                (int)(c.G * 255), (int)(c.B * 255)));
 #if DEBUG
-                            if (i < 10 && y < 10)
+                            if (i == 0 && y == 100)
                             {
-                                Console.WriteLine(direction);
+                                //Console.WriteLine(direction);
+                                Console.WriteLine("color: " + c);
                             }
 #endif
                         }
                     }
+
+                    pictureBox1.Image = bmp;
 
                     MessageBox.Show("Rendered with success", "Done");
                 }

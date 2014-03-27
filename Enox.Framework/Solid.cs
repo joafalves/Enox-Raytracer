@@ -9,18 +9,18 @@ namespace Enox.Framework
     {
         #region fields
 
-        private int materialIndex;
+        //private int materialIndex;
         private List<Triangle> triangles = new List<Triangle>();
 
         #endregion
 
         #region properties
 
-        public int MaterialIndex
-        {
-            get { return materialIndex; }
-            set { materialIndex = value; }
-        }
+        //public int MaterialIndex
+        //{
+        //    get { return materialIndex; }
+        //    set { materialIndex = value; }
+        //}
 
         public List<Triangle> Triangles
         {
@@ -49,9 +49,7 @@ namespace Enox.Framework
                     Vector3 v = t.Points[2] - t.Points[0];
                     t.Normal = u * v;
 
-                    triangles.Add(t);
-
-                 
+                    triangles.Add(t);                 
                 }
 
                 if (c == 0)
