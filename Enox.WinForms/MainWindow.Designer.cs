@@ -113,25 +113,42 @@
             // loadToolStripMenuItem
             // 
             this.loadToolStripMenuItem.Name = "loadToolStripMenuItem";
+<<<<<<< HEAD
             this.loadToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
             this.loadToolStripMenuItem.Text = " Load Scene File..";
+=======
+            this.loadToolStripMenuItem.Size = new System.Drawing.Size(104, 22);
+            this.loadToolStripMenuItem.Text = "Load";
+>>>>>>> bfbe18ddbc95586aec559d368e96a622d79dc116
             this.loadToolStripMenuItem.Click += new System.EventHandler(this.loadToolStripMenuItem_Click);
             // 
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
+<<<<<<< HEAD
             this.saveToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
+=======
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(104, 22);
+>>>>>>> bfbe18ddbc95586aec559d368e96a622d79dc116
             this.saveToolStripMenuItem.Text = "Save..";
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
+<<<<<<< HEAD
             this.toolStripSeparator1.Size = new System.Drawing.Size(161, 6);
+=======
+            this.toolStripSeparator1.Size = new System.Drawing.Size(101, 6);
+>>>>>>> bfbe18ddbc95586aec559d368e96a622d79dc116
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+<<<<<<< HEAD
             this.exitToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
+=======
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(104, 22);
+>>>>>>> bfbe18ddbc95586aec559d368e96a622d79dc116
             this.exitToolStripMenuItem.Text = "Exit";
             // 
             // toolsToolStripMenuItem
@@ -141,6 +158,7 @@
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(51, 20);
             this.toolsToolStripMenuItem.Text = " &Tools";
+            this.toolsToolStripMenuItem.DropDownOpening += new System.EventHandler(this.toolsToolStripMenuItem_DropDownOpening);
             // 
             // renderToolStripMenuItem
             // 
