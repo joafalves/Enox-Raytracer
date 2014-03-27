@@ -12,8 +12,6 @@ namespace Enox.Framework
         private float distance, fieldOfView, horizontal, vertical;
         private Vector3 position;
 
-
-
         #endregion
 
         #region properties

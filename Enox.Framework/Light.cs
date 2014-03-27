@@ -10,7 +10,7 @@ namespace Enox.Framework
         #region fields
 
         private Vector3 position;
-        private float r, g, b;
+        private Color color;
 
         #endregion
 
@@ -22,22 +22,10 @@ namespace Enox.Framework
             set { position = value; }
         }
 
-        public float R
+        public Color Color
         {
-            get { return r; }
-            set { r = value; }
-        }
-
-        public float G
-        {
-            get { return g; }
-            set { g = value; }
-        }
-
-        public float B
-        {
-            get { return b; }
-            set { b = value; }
+            get { return color; }
+            set { color = value; }
         }
 
         #endregion
@@ -63,9 +51,7 @@ namespace Enox.Framework
 
             return new Light()
             {
-                r = red,
-                g = green,
-                b = blue,
+                color = new Color(red, green, blue),
                 position = position
             };
         }

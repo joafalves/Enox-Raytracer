@@ -10,30 +10,17 @@ namespace Enox.Framework
         #region field
 
         private int horizontal, vertical;
-        private float r, g, b;
+        private Color color;
 
         #endregion
 
         #region properties
 
-        public float R
+        public Color Color
         {
-            get { return r; }
-            set { r = value; }
+            get { return color; }
+            set { color = value;  }
         }
-
-        public float G
-        {
-            get { return g; }
-            set { g = value; }
-        }
-
-        public float B
-        {
-            get { return b; }
-            set { b = value; }
-        }
-
         public int Horizontal
         {
             get { return horizontal; }
@@ -56,9 +43,7 @@ namespace Enox.Framework
         {
             this.horizontal = horizontal;
             this.vertical = vertical;
-            this.r = r;
-            this.g = g;
-            this.b = b;
+            this.color = new Color(r, g, b);
         }
 
         #endregion
@@ -68,8 +53,7 @@ namespace Enox.Framework
         public static Image FromString(string content)
         {
             var lines = content.Trim().Split('\n');
-
-
+            
             float horizontal = (float)Convert.ToDecimal(lines[0].Split(' ')[0]);
             float vertical = (float)Convert.ToDecimal(lines[0].Split(' ')[0]);
             
@@ -82,9 +66,7 @@ namespace Enox.Framework
             {
                 horizontal = (int)horizontal,
                 vertical = (int)vertical,
-                r = red,
-                g = green,
-                b = blue
+                color = new Color(red, green, blue)
             };
         }
 

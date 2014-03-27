@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Camera.cs" />
+    <Compile Include="Color.cs" />
     <Compile Include="Image.cs" />
     <Compile Include="Light.cs" />
     <Compile Include="Material.cs" />

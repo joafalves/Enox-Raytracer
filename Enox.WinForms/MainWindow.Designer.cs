@@ -113,102 +113,25 @@
             // loadToolStripMenuItem
             // 
             this.loadToolStripMenuItem.Name = "loadToolStripMenuItem";
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-            this.loadToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
-            this.loadToolStripMenuItem.Text = " Load Scene File..";
-=======
-=======
->>>>>>> bfbe18ddbc95586aec559d368e96a622d79dc116
-=======
->>>>>>> bfbe18ddbc95586aec559d368e96a622d79dc116
-=======
->>>>>>> bfbe18ddbc95586aec559d368e96a622d79dc116
-=======
->>>>>>> bfbe18ddbc95586aec559d368e96a622d79dc116
-            this.loadToolStripMenuItem.Size = new System.Drawing.Size(104, 22);
-            this.loadToolStripMenuItem.Text = "Load";
->>>>>>> bfbe18ddbc95586aec559d368e96a622d79dc116
+            this.loadToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.loadToolStripMenuItem.Text = "Load Scene..";
             this.loadToolStripMenuItem.Click += new System.EventHandler(this.loadToolStripMenuItem_Click);
             // 
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
-=======
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(104, 22);
->>>>>>> bfbe18ddbc95586aec559d368e96a622d79dc116
-=======
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(104, 22);
->>>>>>> bfbe18ddbc95586aec559d368e96a622d79dc116
-=======
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(104, 22);
->>>>>>> bfbe18ddbc95586aec559d368e96a622d79dc116
-=======
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(104, 22);
->>>>>>> bfbe18ddbc95586aec559d368e96a622d79dc116
-=======
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(104, 22);
->>>>>>> bfbe18ddbc95586aec559d368e96a622d79dc116
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.saveToolStripMenuItem.Text = "Save..";
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-            this.toolStripSeparator1.Size = new System.Drawing.Size(161, 6);
-=======
-            this.toolStripSeparator1.Size = new System.Drawing.Size(101, 6);
->>>>>>> bfbe18ddbc95586aec559d368e96a622d79dc116
-=======
-            this.toolStripSeparator1.Size = new System.Drawing.Size(101, 6);
->>>>>>> bfbe18ddbc95586aec559d368e96a622d79dc116
-=======
-            this.toolStripSeparator1.Size = new System.Drawing.Size(101, 6);
->>>>>>> bfbe18ddbc95586aec559d368e96a622d79dc116
-=======
-            this.toolStripSeparator1.Size = new System.Drawing.Size(101, 6);
->>>>>>> bfbe18ddbc95586aec559d368e96a622d79dc116
-=======
-            this.toolStripSeparator1.Size = new System.Drawing.Size(101, 6);
->>>>>>> bfbe18ddbc95586aec559d368e96a622d79dc116
+            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
-=======
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(104, 22);
->>>>>>> bfbe18ddbc95586aec559d368e96a622d79dc116
-=======
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(104, 22);
->>>>>>> bfbe18ddbc95586aec559d368e96a622d79dc116
-=======
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(104, 22);
->>>>>>> bfbe18ddbc95586aec559d368e96a622d79dc116
-=======
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(104, 22);
->>>>>>> bfbe18ddbc95586aec559d368e96a622d79dc116
-=======
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(104, 22);
->>>>>>> bfbe18ddbc95586aec559d368e96a622d79dc116
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             // 
             // toolsToolStripMenuItem

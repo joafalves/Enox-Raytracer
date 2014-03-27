@@ -40,7 +40,7 @@ namespace Enox.WinForms
             sceneViewGLControl.Paint += sceneViewGLControl_Paint;
             sceneViewGLControl.Resize += sceneViewGLControl_Resize;
 
-            GL.ClearColor(Color.CornflowerBlue);
+            GL.ClearColor(System.Drawing.Color.CornflowerBlue);
 
             SetViewport();
         }
@@ -76,6 +76,7 @@ namespace Enox.WinForms
         private void loadToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
+            ofd.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory + "\\Content\\";
 
             if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK && ofd.FileName != string.Empty)
             {

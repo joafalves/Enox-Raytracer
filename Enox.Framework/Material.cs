@@ -9,7 +9,7 @@ namespace Enox.Framework
     {
         #region fields
 
-        private float r, g, b;
+        private Color color;
         private float ambient, diffuse, reflection, refractionCoef, refractionIndex;
 
         #endregion
@@ -46,22 +46,10 @@ namespace Enox.Framework
             set { ambient = value; }
         }
 
-        public float R
+        public Color Color
         {
-            get { return r; }
-            set { r = value; }
-        }
-
-        public float G
-        {
-            get { return g; }
-            set { g = value; }
-        }
-
-        public float B
-        {
-            get { return b; }
-            set { b = value; }
+            get { return color; }
+            set { color = value; }
         }
 
         #endregion
@@ -86,9 +74,7 @@ namespace Enox.Framework
 
             return new Material()
             {
-                r = red,
-                g = green,
-                b = blue,
+                color = new Color(red, green, blue),
                 ambient = ambient,
                 diffuse = diffuse,
                 reflection = reflection,
