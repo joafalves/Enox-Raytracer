@@ -47,9 +47,7 @@ namespace Enox.Framework
             if (tr != null)
             {
                 //v1:
-                //return scene.Materials[tr.MaterialIndex].Color;
-
-                
+                //return scene.Materials[tr.MaterialIndex].Color;                
                 // v2: 
                 Color c = new Color(0, 0, 0, 1);
 
@@ -58,19 +56,18 @@ namespace Enox.Framework
                 {
                     c += light.Color * scene.Materials[tr.MaterialIndex].Color * scene.Materials[tr.MaterialIndex].Ambient;
                 }
-
-                return c;
-
-                /*
-                
+                                                              
                 // contribuição luz difusa
                 foreach (var light in scene.Lights)
                 {
+                    //Vector3 l = Vector3.Normalize(light.Position, p)
                     //Vector3 l = normalize(light.Position - P);
                     //float cost = produto_escalar(N) . l; 
                     //if( !IsExposedToLight(light) && cost > 0) c = c + light.Color * scene.Materials[tr.MaterialIndex].Color * scene.Materials[tr.MaterialIndex].Diffuse * cos(º);
                 }
-                */
+
+                return c;
+               
             }
 
             return scene.Images[0].Color; // TODO: Bg color
@@ -187,7 +184,7 @@ namespace Enox.Framework
                     }
                 }
             }
-
+            // TODO: calcular P(t) 
             return nearestTriangle;
         }
 
