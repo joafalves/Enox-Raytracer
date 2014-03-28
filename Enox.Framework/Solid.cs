@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -61,11 +62,15 @@ namespace Enox.Framework
                 else
                 {
                     var split = lines[i].Split(' ');
+
                     t.Points[c - 1] = new Vector3()
                     {
-                        X = (float)Convert.ToDecimal(split[0]),
-                        Y = (float)Convert.ToDecimal(split[1]),
-                        Z = (float)Convert.ToDecimal(split[2])
+                        //X = (float)Convert.ToDecimal(split[0]), // this way won't detected 'E'
+                        //Y = (float)Convert.ToDecimal(split[1]),
+                        //Z = (float)Convert.ToDecimal(split[2])
+                        X = float.Parse(split[0]),
+                        Y = float.Parse(split[1]),
+                        Z = float.Parse(split[2])
                     };
                 }
 

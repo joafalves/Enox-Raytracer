@@ -64,6 +64,21 @@ namespace Enox.Framework
             return string.Format("[r:{0},g:{1},b:{2},a:{3}]", r, g, b, a);
         }
 
+        public static Color operator +(Color a, Color b)
+        {
+            return new Color(a.R + b.R, a.G + b.G, a.B + b.B);
+        }
+
+        public static Color operator *(Color a, Color b)
+        {
+            return new Color(a.R * b.R, a.G * b.G, a.B * b.B);
+        }
+
+        public static Color operator *(Color a, float b)
+        {
+            return new Color(a.R * b, a.G * b, a.B * b);
+        }
+
         #endregion
     }
 }

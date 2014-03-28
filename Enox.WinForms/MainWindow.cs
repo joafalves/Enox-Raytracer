@@ -154,8 +154,9 @@ namespace Enox.WinForms
                         }
                     }
 
+                    bmp.RotateFlip(RotateFlipType.Rotate180FlipNone);
                     pictureBox1.Image = bmp;
-
+                  
                     MessageBox.Show("Rendered with success", "Done");
                 }
                 catch (Exception ex)

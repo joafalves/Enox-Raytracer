@@ -47,18 +47,22 @@ namespace Enox.Framework
             if (tr != null)
             {
                 //v1:
-                return scene.Materials[tr.MaterialIndex].Color;
+                //return scene.Materials[tr.MaterialIndex].Color;
 
-                /*
+                
                 // v2: 
                 Color c = new Color(0, 0, 0, 1);
 
                 // contribuição luz ambiente:
                 foreach (var light in scene.Lights)
                 {
-                    // c += light.Color *  scene.Materials[tr.MaterialIndex].Color * scene.Materials[tr.MaterialIndex].Ambient;
+                    c += light.Color * scene.Materials[tr.MaterialIndex].Color * scene.Materials[tr.MaterialIndex].Ambient;
                 }
 
+                return c;
+
+                /*
+                
                 // contribuição luz difusa
                 foreach (var light in scene.Lights)
                 {
