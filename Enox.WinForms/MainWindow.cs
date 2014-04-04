@@ -9,16 +9,62 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
+using OpenTK;
+
+using Vector3 = Enox.Framework.Vector3;
+using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace Enox.WinForms
 {
     public partial class MainWindow : Form
     {
+        const int MAX_DISPLAY_LISTS = 1;
+        int[] displayLists = new int[MAX_DISPLAY_LISTS];
         private Scene myScene;
+        object mutex = new object();
 
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        void SetDisplayList()
+        {
+            int firstList = GL.GenLists(MAX_DISPLAY_LISTS);
+            displayLists[0] = firstList;
+
+            GL.NewList(firstList, ListMode.Compile);
+
+            Render();
+
+            GL.EndList();
+        }
+
+        void Render()
+        {
+            GL.PushMatrix();
+            {
+                //GL.Translate(myScene.Cameras[0].Position.X, myScene.Cameras[0].Position.Y, myScene.Cameras[0].Position.Z);
+
+                GL.Begin(PrimitiveType.Triangles);
+                {
+                    foreach (Solid s in myScene.Solids)
+                    {
+                        foreach (Triangle t in s.Triangles)
+                        {
+                            Enox.Framework.Color c = myScene.Materials[t.MaterialIndex].Color;
+                            GL.Color3(c.R, c.G, c.B);
+                            foreach (Vector3 p in t.Points)
+                            {
+                                GL.Vertex3(p.X, p.Y, p.Z);
+                            }
+                        }
+                    }
+                }
+                GL.End();
+            }
+            GL.PopMatrix();
         }
 
         void SetViewport()
@@ -27,10 +73,57 @@ namespace Enox.WinForms
                 sceneViewGLControl.ClientSize = new System.Drawing.Size(sceneViewGLControl.ClientSize.Width, 1);
 
             GL.Viewport(0, 0, sceneViewGLControl.ClientSize.Width, sceneViewGLControl.ClientSize.Height);
-            GL.Ortho(0, 640, 480, 0, 0, 100);
 
+            float aspectRatio = (float)sceneViewGLControl.ClientSize.Width / (float)sceneViewGLControl.ClientSize.Height;
+            Matrix4 perpective = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, aspectRatio, 1, 500);
             GL.MatrixMode(MatrixMode.Projection);
-            GL.LoadIdentity();
+            GL.LoadMatrix(ref perpective);
+
+            //GL.Ortho(-myScene.Cameras[0].Vertical, myScene.Cameras[0].Horizontal, myScene.Cameras[0].Vertical, -myScene.Cameras[0].Horizontal, 0, 100);
+            //GL.Ortho(-1, 1, 1, -1, 0f, 100.0f);
+
+            //Matrix4 perspective = 
+
+            //OpenTK.Vector3 eye = new OpenTK.Vector3(myScene.Cameras[0].Position.X, myScene.Cameras[0].Position.Y,
+            //    myScene.Cameras[0].Position.Z);
+
+            //Matrix4 lookat = Matrix4.LookAt(eye, OpenTK.Vector3.Zero, OpenTK.Vector3.UnitY);
+            //GL.MatrixMode(MatrixMode.Modelview);
+            //GL.LoadMatrix(ref lookat);
+
+            //GL.MatrixMode(MatrixMode.Projection);
+            //GL.LoadIdentity();
+
+            //GL.MatrixMode(MatrixMode.Projection);
+            //Matrix4 p = Matrix4.CreatePerspectiveFieldOfView(OpenTK.MathHelper.PiOver4,
+            //    myScene.Cameras[0].Horizontal / myScene.Cameras[0].Vertical,
+            //    0.1f, 100.0f); 
+            //GL.LoadMatrix(ref p);
+
+            //GL.MatrixMode(MatrixMode.Modelview);
+            //GL.LoadIdentity();
+
+        }
+
+        void SetScene()
+        {
+            if (myScene == null) return;
+
+            float[] light_position = { 1.0f, 1.0f, 1.0f, 0.0f };
+            float[] light_ambient = { 0.5f, 0.5f, 0.5f, 1.0f };
+            float[] mat_specular = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+            GL.ShadeModel(ShadingModel.Smooth);
+
+            GL.Enable(EnableCap.Lighting);
+            GL.Enable(EnableCap.Light0);
+            GL.Enable(EnableCap.DepthTest);
+            GL.Enable(EnableCap.ColorMaterial);
+            GL.Enable(EnableCap.CullFace);
+
+            GL.Light(LightName.Light0, LightParameter.Ambient, light_ambient);
+            GL.Light(LightName.Light0, LightParameter.Position, light_position);
+            GL.Light(LightName.Light0, LightParameter.Diffuse, mat_specular);
         }
 
         protected override void OnLoad(EventArgs e)
@@ -41,29 +134,34 @@ namespace Enox.WinForms
             sceneViewGLControl.Resize += sceneViewGLControl_Resize;
 
             GL.ClearColor(System.Drawing.Color.CornflowerBlue);
-
-            SetViewport();
         }
 
         void sceneViewGLControl_Resize(object sender, EventArgs e)
         {
-            SetViewport();
+            if (myScene != null)
+                SetViewport();
         }
 
         void sceneViewGLControl_Paint(object sender, PaintEventArgs e)
         {
             sceneViewGLControl.MakeCurrent();
 
-            GL.Clear(ClearBufferMask.ColorBufferBit);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             //GL.LineWidth(4);
             //GL.Begin(PrimitiveType.Lines);
             //{
             //    GL.Color4(1.0f, 1.0f, 1.0f, 1.0f);
-            //    GL.Vertex2(0, 100);
-            //    GL.Vertex2(600, 100);
+            //    GL.Vertex2(0, 0);
+            //    GL.Vertex2(0.9f, 1);
             //}
             //GL.End();
+
+            if (myScene != null)
+            {
+                GL.CallLists(displayLists[0], ListNameType.Int, displayLists); // faster
+                //Render();
+            }
 
             sceneViewGLControl.SwapBuffers();
         }
@@ -84,23 +182,31 @@ namespace Enox.WinForms
                 {
                     myScene = Scene.FromFile(ofd.FileName);
 
-                    MessageBox.Show("Scene loaded with success!", "Sucess!");
+                    SetScene();
+                    SetViewport();
+                    SetDisplayList();
+
+                    sceneViewGLControl.Invalidate();
+
+                    //MessageBox.Show("Scene loaded with success!", "Sucess!");
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message, "Error!");
                 }
-
             }
         }
 
         private void renderToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            List<Task> tasks = new List<Task>();
+    
             if (myScene != null)
             {
                 try
                 {
                     Bitmap bmp = new Bitmap(myScene.Images[0].Horizontal, myScene.Images[0].Vertical);
+                    System.Drawing.Color[,] bmData = new System.Drawing.Color[myScene.Images[0].Horizontal, myScene.Images[0].Vertical];
                     //byte[] colorArray = new byte[myScene.Images[0].Horizontal * myScene.Images[0].Vertical];
 
                     float height = 2 * myScene.Cameras[0].Distance *
@@ -111,23 +217,14 @@ namespace Enox.WinForms
 
                     Vector3 origin = new Vector3(0, 0, myScene.Cameras[0].Distance);
 
-                    //MessageBox.Show(height.ToString() + "::" + width.ToString() + "::" + pixelSize);
-                    int colorCounter = 0;
-                    for (int i = 0; i < myScene.Images[0].Horizontal; i++)
+                    Stopwatch stopwatch = new Stopwatch();
+                    stopwatch.Start();
+
+                    Parallel.For(0, myScene.Images[0].Horizontal, i =>
                     {
                         for (int y = 0; y < myScene.Images[0].Vertical; y++)
+                        //Parallel.For(0, myScene.Images[0].Vertical, y =>
                         {
-                            // construir raio(i, j)
-                            // Color c = RayTrace(r);
-                            // pixel[i, j] = c;
-
-                            // origin camera  = (0, 0, d); d = 3
-                            // direçao = normalize((px, py, pz) - (origin))
-                            // px = pixelSize * (i + 0.5f) - (width/2)
-                            // py = pixelSize * (y + 0.5f) - (height/2)
-                            // pz = 0
-
-
                             float px = pixelSize * (i + 0.5f) - (width / 2);
                             float py = pixelSize * (y + 0.5f) - (height / 2);
                             Vector3 df = new Vector3(px, py, 0) - origin;
@@ -139,35 +236,150 @@ namespace Enox.WinForms
                                 Origin = origin
                             };
 
-                            Enox.Framework.Color c = Ray.Trace(myScene, r, 2);
+                            Enox.Framework.Color color = Ray.Trace(myScene, r, 2);
 
-                            float red = (c.R > 1 ? 1 : c.R);
-                            float green = (c.G > 1 ? 1 : c.G);
-                            float blue = (c.B > 1 ? 1 : c.B);
+                            float red = (color.R > 1 ? 1 : color.R);
+                            float green = (color.G > 1 ? 1 : color.G);
+                            float blue = (color.B > 1 ? 1 : color.B);
 
-                            try
-                            {
-                                bmp.SetPixel(i, y,
-                                    System.Drawing.Color.FromArgb((int)(255), (int)(red * 255),
-                                    (int)(green * 255), (int)(blue * 255)));
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine(ex.ToString());
-                            }
-#if DEBUG
-                            if (i == 0 && y == 100)
-                            {
-                                //Console.WriteLine(direction);
-                                Console.WriteLine("color: " + c);
-                            }
-#endif
+                            //lock (mutex)
+                            //{
+                            //    bmp.SetPixel(i, y,
+                            //        System.Drawing.Color.FromArgb((int)(255), (int)(red * 255),
+                            //        (int)(green * 255), (int)(blue * 255)));
+                            //}
+
+                            bmData[i, y] = System.Drawing.Color.FromArgb((int)(255), (int)(red * 255),
+                                            (int)(green * 255), (int)(blue * 255));
+                        }
+                        // });
+                    });
+
+                    // store pixel data on bitmap:
+                    for (int i = 0; i < myScene.Images[0].Horizontal; i++)
+                    {
+                        for (int y = 0; y < myScene.Images[0].Vertical; y++)
+                        {
+                            bmp.SetPixel(i, y, bmData[i, y]);
                         }
                     }
 
+                    // old way (without parallelism)
+                    //for (int i = 0; i < myScene.Images[0].Horizontal; i++)
+                    //{
+                    //    for (int y = 0; y < myScene.Images[0].Vertical; y++)
+                    //    {
+                    //        float px = pixelSize * (i + 0.5f) - (width / 2);
+                    //        float py = pixelSize * (y + 0.5f) - (height / 2);
+                    //        Vector3 df = new Vector3(px, py, 0) - origin;
+                    //        Vector3 direction = Vector3.Normalize(df);
+
+                    //        Ray r = new Ray()
+                    //        {
+                    //            Direction = direction,
+                    //            Origin = origin
+                    //        };
+
+                    //        Enox.Framework.Color color = Ray.Trace(myScene, r, 2);
+
+                    //        float red = (color.R > 1 ? 1 : color.R);
+                    //        float green = (color.G > 1 ? 1 : color.G);
+                    //        float blue = (color.B > 1 ? 1 : color.B);
+
+                    //        bmp.SetPixel(i, y,
+                    //            System.Drawing.Color.FromArgb((int)(255), (int)(red * 255),
+                    //            (int)(green * 255), (int)(blue * 255)));
+                    //    }
+                    //}
+
+                    stopwatch.Stop();
+                    Console.WriteLine("elapsed: " + stopwatch.Elapsed.TotalSeconds);
+
+                    //for (int i = 0; i < 3; i++)
+                    //{
+                    //    for (int y = 0; y < 3; y++)
+                    //    {
+                    //        Task t = new Task(() =>
+                    //        {
+                    //            int myi = i;
+                    //            int myy = y;
+                    //            Console.WriteLine(myi + "**" + myy);
+                    //            float rangeX = divx * myi + divx;
+                    //            for (int l = divx * myi; l < rangeX; l++)
+                    //            {
+                    //                float rangeY = divy * myy + divy;
+                    //                for (int c = divy * myy; c < rangeY; c++)
+                    //                {
+
+
+                    //                    float px = pixelSize * (myi + 0.5f) - (width / 2);
+                    //                    float py = pixelSize * (myy + 0.5f) - (height / 2);
+                    //                    Vector3 df = new Vector3(px, py, 0) - origin;
+                    //                    Vector3 direction = Vector3.Normalize(df);
+
+                    //                    Ray r = new Ray()
+                    //                    {
+                    //                        Direction = direction,
+                    //                        Origin = origin
+                    //                    };
+
+                    //                    Enox.Framework.Color color = Ray.Trace(myScene, r, 2);
+
+                    //                    float red = (color.R > 1 ? 1 : color.R);
+                    //                    float green = (color.G > 1 ? 1 : color.G);
+                    //                    float blue = (color.B > 1 ? 1 : color.B);
+
+                    //                    lock (mutex)
+                    //                    {
+                    //                        //try
+                    //                        //{
+                    //                        bmp.SetPixel(l, c,
+                    //                            System.Drawing.Color.FromArgb((int)(255), (int)(red * 255),
+                    //                            (int)(green * 255), (int)(blue * 255)));
+                    //                        //}
+                    //                        //catch (Exception ex)
+                    //                        //{
+                    //                        //    Console.WriteLine(ex.ToString());
+                    //                        //}
+                    //                    }
+                    //                }
+                    //            }
+                    //        });
+                    //        t.Start();
+                    //        tasks.Add(t);
+                    //    }
+                    //}
+
+                    //for (int i = 0; i < myScene.Images[0].Horizontal; i++)
+                    //{
+                    //    for (int y = 0; y < myScene.Images[0].Vertical; y++)
+                    //    {
+                            // construir raio(i, j)
+                            // Color c = RayTrace(r);
+                            // pixel[i, j] = c;
+
+                            // origin camera  = (0, 0, d); d = 3
+                            // direçao = normalize((px, py, pz) - (origin))
+                            // px = pixelSize * (i + 0.5f) - (width/2)
+                            // py = pixelSize * (y + 0.5f) - (height/2)
+                            // pz = 0
+
+                       
+//#if DEBUG
+//                            if (i == 0 && y == 100)
+//                            {
+//                                //Console.WriteLine(direction);
+//                                Console.WriteLine("color: " + c);
+//                            }
+//#endif
+                    //    }
+                    //}
+
+                    //Task.WaitAll(tasks.ToArray());
+                    
                     bmp.RotateFlip(RotateFlipType.Rotate180FlipX);
                     pictureBox1.Image = bmp;
-                  
+
                     MessageBox.Show("Rendered with success", "Done");
                 }
                 catch (Exception ex)
