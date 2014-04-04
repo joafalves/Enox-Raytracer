@@ -162,6 +162,7 @@ namespace Enox.WinForms
         {
             if (myScene != null)
             {
+                stopwatch.Reset();
                 stopwatch.Start();
 
                 try
