@@ -19,10 +19,11 @@ namespace Enox.WinForms
 {
     public partial class MainWindow : Form
     {
-        const int MAX_DISPLAY_LISTS = 1;
-        int[] displayLists = new int[MAX_DISPLAY_LISTS];
+        private const int MAX_DISPLAY_LISTS = 1; // we only need 1 
+        private int[] displayLists = new int[MAX_DISPLAY_LISTS];
         private Scene myScene;
-        object mutex = new object();
+        private object mutex = new object();
+        private BackgroundWorker bgWorker = new BackgroundWorker();
 
         public MainWindow()
         {
@@ -134,73 +135,25 @@ namespace Enox.WinForms
             sceneViewGLControl.Resize += sceneViewGLControl_Resize;
 
             GL.ClearColor(System.Drawing.Color.CornflowerBlue);
+
+            bgWorker.DoWork += bgWorker_DoWork;
+            bgWorker.RunWorkerCompleted += bgWorker_RunWorkerCompleted;
+            bgWorker.ProgressChanged += bgWorker_ProgressChanged;
+            bgWorker.WorkerReportsProgress = true;
         }
 
-        void sceneViewGLControl_Resize(object sender, EventArgs e)
+        void bgWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            if (myScene != null)
-                SetViewport();
+            windowProgressBar.Value = e.ProgressPercentage;
         }
 
-        void sceneViewGLControl_Paint(object sender, PaintEventArgs e)
+        void bgWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            sceneViewGLControl.MakeCurrent();
-
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
-            //GL.LineWidth(4);
-            //GL.Begin(PrimitiveType.Lines);
-            //{
-            //    GL.Color4(1.0f, 1.0f, 1.0f, 1.0f);
-            //    GL.Vertex2(0, 0);
-            //    GL.Vertex2(0.9f, 1);
-            //}
-            //GL.End();
-
-            if (myScene != null)
-            {
-                GL.CallLists(displayLists[0], ListNameType.Int, displayLists); // faster
-                //Render();
-            }
-
-            sceneViewGLControl.SwapBuffers();
+            windowProgressBar.Value = 0;
         }
 
-        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        void bgWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-
-        }
-
-        private void loadToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog ofd = new OpenFileDialog();
-            ofd.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory + "\\Content\\";
-
-            if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK && ofd.FileName != string.Empty)
-            {
-                try
-                {
-                    myScene = Scene.FromFile(ofd.FileName);
-
-                    SetScene();
-                    SetViewport();
-                    SetDisplayList();
-
-                    sceneViewGLControl.Invalidate();
-
-                    //MessageBox.Show("Scene loaded with success!", "Sucess!");
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Error!");
-                }
-            }
-        }
-
-        private void renderToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            List<Task> tasks = new List<Task>();
-    
             if (myScene != null)
             {
                 try
@@ -220,6 +173,7 @@ namespace Enox.WinForms
                     Stopwatch stopwatch = new Stopwatch();
                     stopwatch.Start();
 
+                    int c = 0;
                     Parallel.For(0, myScene.Images[0].Horizontal, i =>
                     {
                         for (int y = 0; y < myScene.Images[0].Vertical; y++)
@@ -251,6 +205,10 @@ namespace Enox.WinForms
 
                             bmData[i, y] = System.Drawing.Color.FromArgb((int)(255), (int)(red * 255),
                                             (int)(green * 255), (int)(blue * 255));
+
+                            c++;
+                            bgWorker.ReportProgress(c * 100 / (myScene.Images[0].Horizontal * myScene.Images[0].Vertical));
+   
                         }
                         // });
                     });
@@ -354,39 +312,108 @@ namespace Enox.WinForms
                     //{
                     //    for (int y = 0; y < myScene.Images[0].Vertical; y++)
                     //    {
-                            // construir raio(i, j)
-                            // Color c = RayTrace(r);
-                            // pixel[i, j] = c;
+                    // construir raio(i, j)
+                    // Color c = RayTrace(r);
+                    // pixel[i, j] = c;
 
-                            // origin camera  = (0, 0, d); d = 3
-                            // direçao = normalize((px, py, pz) - (origin))
-                            // px = pixelSize * (i + 0.5f) - (width/2)
-                            // py = pixelSize * (y + 0.5f) - (height/2)
-                            // pz = 0
+                    // origin camera  = (0, 0, d); d = 3
+                    // direçao = normalize((px, py, pz) - (origin))
+                    // px = pixelSize * (i + 0.5f) - (width/2)
+                    // py = pixelSize * (y + 0.5f) - (height/2)
+                    // pz = 0
 
-                       
-//#if DEBUG
-//                            if (i == 0 && y == 100)
-//                            {
-//                                //Console.WriteLine(direction);
-//                                Console.WriteLine("color: " + c);
-//                            }
-//#endif
+
+                    //#if DEBUG
+                    //                            if (i == 0 && y == 100)
+                    //                            {
+                    //                                //Console.WriteLine(direction);
+                    //                                Console.WriteLine("color: " + c);
+                    //                            }
+                    //#endif
                     //    }
                     //}
 
                     //Task.WaitAll(tasks.ToArray());
-                    
+
                     bmp.RotateFlip(RotateFlipType.Rotate180FlipX);
                     pictureBox1.Image = bmp;
 
-                    MessageBox.Show("Rendered with success", "Done");
+                    MessageBox.Show("Rendered with success in " + stopwatch.Elapsed.Seconds + " seconds", "Done");
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message, "Error!");
                 }
             }
+        }
+
+        void sceneViewGLControl_Resize(object sender, EventArgs e)
+        {
+            if (myScene != null)
+                SetViewport();
+        }
+
+        void sceneViewGLControl_Paint(object sender, PaintEventArgs e)
+        {
+            sceneViewGLControl.MakeCurrent();
+
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+            //GL.LineWidth(4);
+            //GL.Begin(PrimitiveType.Lines);
+            //{
+            //    GL.Color4(1.0f, 1.0f, 1.0f, 1.0f);
+            //    GL.Vertex2(0, 0);
+            //    GL.Vertex2(0.9f, 1);
+            //}
+            //GL.End();
+
+            if (myScene != null)
+            {
+                GL.CallLists(displayLists[0], ListNameType.Int, displayLists); // faster
+                //Render();
+            }
+
+            sceneViewGLControl.SwapBuffers();
+        }
+
+        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+
+        }
+
+        private void loadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory + "\\Content\\";
+
+            if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK && ofd.FileName != string.Empty)
+            {
+                try
+                {
+                    myScene = Scene.FromFile(ofd.FileName);
+
+                    SetScene();
+                    SetViewport();
+                    SetDisplayList();
+
+                    sceneViewGLControl.Invalidate();
+
+                    //MessageBox.Show("Scene loaded with success!", "Sucess!");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Error!");
+                }
+            }
+        }
+
+        private void renderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            windowProgressBar.Maximum = 100;
+            windowProgressBar.Value = 0;
+
+            bgWorker.RunWorkerAsync();          
         }
 
         private void toolsToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
