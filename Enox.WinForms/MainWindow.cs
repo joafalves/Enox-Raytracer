@@ -24,6 +24,7 @@ namespace Enox.WinForms
         private Scene myScene;
         private object mutex = new object();
         private BackgroundWorker bgWorker = new BackgroundWorker();
+        private Stopwatch stopwatch = new Stopwatch();
 
         public MainWindow()
         {
@@ -150,12 +151,19 @@ namespace Enox.WinForms
         void bgWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             windowProgressBar.Value = 0;
+
+            stopwatch.Stop();
+            Console.WriteLine("elapsed: " + stopwatch.Elapsed.TotalSeconds);
+
+            MessageBox.Show("Rendered with success in " + stopwatch.Elapsed.Seconds + " seconds", "Done");
         }
 
         void bgWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             if (myScene != null)
             {
+                stopwatch.Start();
+
                 try
                 {
                     Bitmap bmp = new Bitmap(myScene.Images[0].Horizontal, myScene.Images[0].Vertical);
@@ -169,9 +177,6 @@ namespace Enox.WinForms
                     float pixelSize = width / myScene.Images[0].Horizontal;
 
                     Vector3 origin = new Vector3(0, 0, myScene.Cameras[0].Distance);
-
-                    Stopwatch stopwatch = new Stopwatch();
-                    stopwatch.Start();
 
                     int c = 0;
                     Parallel.For(0, myScene.Images[0].Horizontal, i =>
@@ -249,9 +254,6 @@ namespace Enox.WinForms
                     //            (int)(green * 255), (int)(blue * 255)));
                     //    }
                     //}
-
-                    stopwatch.Stop();
-                    Console.WriteLine("elapsed: " + stopwatch.Elapsed.TotalSeconds);
 
                     //for (int i = 0; i < 3; i++)
                     //{
@@ -336,9 +338,7 @@ namespace Enox.WinForms
                     //Task.WaitAll(tasks.ToArray());
 
                     bmp.RotateFlip(RotateFlipType.Rotate180FlipX);
-                    pictureBox1.Image = bmp;
-
-                    MessageBox.Show("Rendered with success in " + stopwatch.Elapsed.Seconds + " seconds", "Done");
+                    pictureBox1.Image = bmp;                    
                 }
                 catch (Exception ex)
                 {
