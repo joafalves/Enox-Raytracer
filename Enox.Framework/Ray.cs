@@ -1,12 +1,4 @@
-﻿//float d = Vector3.Dot(tr.Normal, tr.Points[0]);
-//return (float)-(Vector3.Dot(tr.Normal, r.origin) + d) / Vector3.Dot(tr.Normal, r.direction);
-
-//Triangle a = new Triangle();
-//a.Points[0] = new Vector3(tr.Points[0].X - tr.Points[1].X, tr.Points[0].X - tr.Points[2].X, r.direction.X);
-//a.Points[1] = new Vector3(tr.Points[0].Y - tr.Points[1].Y, tr.Points[0].Y - tr.Points[2].Y, r.direction.Y);
-//a.Points[2] = new Vector3(tr.Points[0].Z - tr.Points[1].Z, tr.Points[0].Z - tr.Points[2].Z, r.direction.Z);
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,6 +8,8 @@ namespace Enox.Framework
     public class Ray
     {
         #region field
+
+        private static readonly float EPSILON = 0.01f;
 
         private Vector3 origin;
         private Vector3 direction;
@@ -42,9 +36,13 @@ namespace Enox.Framework
 
         public static Color Trace(Scene scene, Ray r, int max)
         {
-            Triangle tr = NearestIntersection(scene, r);
+            // stop?
+            if (max == 0) 
+                return new Color(0, 0, 0, 0);
 
-            if (tr != null)
+            IntersectionResult tr = NearestIntersection(scene, r);
+
+            if (tr.triangle != null)
             {
                 //v1:
                 //return scene.Materials[tr.MaterialIndex].Color;                
@@ -54,71 +52,64 @@ namespace Enox.Framework
                 // contribuição luz ambiente:
                 foreach (var light in scene.Lights)
                 {
-                    c += light.Color * scene.Materials[tr.MaterialIndex].Color * scene.Materials[tr.MaterialIndex].Ambient;
+                    c += light.Color * scene.Materials[tr.triangle.MaterialIndex].Color * 
+                        scene.Materials[tr.triangle.MaterialIndex].Ambient;
                 }
                                                               
-                // contribuição luz difusa
+                // contribuição luz difusa 
                 foreach (var light in scene.Lights)
                 {
-                    //Vector3 l = Vector3.Normalize(light.Position, p)
-                    //Vector3 l = normalize(light.Position - P);
-                    //float cost = produto_escalar(N) . l; 
-                    //if( !IsExposedToLight(light) && cost > 0) c = c + light.Color * scene.Materials[tr.MaterialIndex].Color * scene.Materials[tr.MaterialIndex].Diffuse * cos(º);
+                    Vector3 l = light.Position - tr.point;
+                    float dist = Vector3.Length(l);
+                    l = Vector3.Normalize(l);
+                    float cost = tr.triangle.Normal.Dot(l);
+
+                    Ray s = new Ray()
+                    {
+                        origin = tr.point,
+                        direction = l
+                    };
+
+                    if (IsExposedToLight(scene, s, dist) && cost > 0)
+                        c = c + light.Color * scene.Materials[tr.triangle.MaterialIndex].Color
+                            * scene.Materials[tr.triangle.MaterialIndex].Diffuse * cost;
                 }
 
-                return c;
-               
+                // reflection
+                if (scene.Materials[tr.triangle.MaterialIndex].Reflection > 0.0f)
+                {
+                    float c1 = -tr.triangle.Normal.Dot(r.direction);
+                    Vector3 rl = Vector3.Normalize(r.direction + (tr.triangle.Normal * 2.0f * c1));
+                    Ray refl = new Ray()
+                    {
+                        origin = tr.point,
+                        direction = rl
+                    };
+
+                    c += Ray.Trace(scene, refl, --max) * scene.Materials[tr.triangle.MaterialIndex].Reflection
+                        * scene.Materials[tr.triangle.MaterialIndex].Color;
+                }
+
+                return c;               
             }
 
-            return scene.Images[0].Color; // TODO: Bg color
+            return scene.Images[0].Color;
         }
 
-        private bool IsExposedToLight(Light light)
+        private static bool IsExposedToLight(Scene scene, Ray r, float dist)
         {
             // if (intersection  => light : triangles) return true; // basta encontrar 1 (mas dentro da largura entre a luz e o ponto)
-
-            return false;
-        }
-
-        private static double MatrixDeterminant(double[,] a, int n)
-        {
-            int i, j, j1, j2;
-            double det = 0;
-            double[,] m = null;
-
-            if (n < 1)
+            foreach (Solid s in scene.Solids)
             {
-                return 0; // error
-            }
-            else if (n == 1)
-            {
-                det = a[0, 0];
-            }
-            else if (n == 2)
-            {
-                det = a[0, 0] * a[1, 1] * a[1, 0] * a[0, 1];
-            }
-            else
-            {
-                det = 0;
-                for (j1 = 0; j1 < n; j1++)
+                foreach (Triangle tr in s.Triangles)
                 {
-                    m = new double[n - 1, n - 1];
-                    for (i = 1; i < n; i++)
-                    {
-                        j2 = 0;
-                        for (j = 0; j < n; j++)
-                        {
-                            if (j == j1) continue;
-                            m[i - 1, j2] = a[i, j];
-                            j2++;
-                        }
-                    }
-                    det = Math.Pow(-1.0, 1.0 + j1 + 1.0) * a[0, j1] * MatrixDeterminant(m, n - 1);
-                }
-            }
+                    float t = (float)Intersection(r, tr);
 
-            return det;
+                    if (t > 0 && t < dist) return false;
+                }
+            }           
+
+            return true;
         }
 
         private static double Determinant(double[,] a)
@@ -133,7 +124,6 @@ namespace Enox.Framework
                 {tr.Points[0].Y - tr.Points[1].Y, tr.Points[0].Y - tr.Points[2].Y, r.direction.Y},
                 {tr.Points[0].Z - tr.Points[1].Z, tr.Points[0].Z - tr.Points[2].Z, r.direction.Z}};
 
-            //double detA = MatrixDeterminant(a, 3);
             double detA = Determinant(a);
 
             double[,] b = new double[3, 3] {
@@ -163,31 +153,42 @@ namespace Enox.Framework
 
             double detT = Determinant(t) / detA;
 
-            if (detT < 0.0000000001f) return -1;
+            if (detT < EPSILON) return -1;
 
             return detT;
         }
 
-        private static Triangle NearestIntersection(Scene scene, Ray r)
+        private static IntersectionResult NearestIntersection(Scene scene, Ray r)
         {
+            Vector3 intersectionPoint = new Vector3(0, 0, 0);
             double tmin = double.MaxValue;
             Triangle nearestTriangle = null;
             foreach (Solid s in scene.Solids)
             {
                 foreach (Triangle tr in s.Triangles)
                 {
-                    double t = Intersection(r, tr);
+                    float t = (float)Intersection(r, tr);
                     if (t > 0 && t < tmin)
                     {
                         tmin = t;
                         nearestTriangle = tr;
+                        intersectionPoint = r.origin + (r.direction * t); // p(t)
                     }
                 }
             }
-            // TODO: calcular P(t) 
-            return nearestTriangle;
+
+            return new IntersectionResult() {
+                triangle = nearestTriangle,
+                point = intersectionPoint
+            };
         }
 
         #endregion
+
+        struct IntersectionResult
+        {
+            internal Triangle triangle;
+            internal Vector3 point;
+        }
     }
 }

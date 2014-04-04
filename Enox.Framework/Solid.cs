@@ -49,6 +49,7 @@ namespace Enox.Framework
                     Vector3 u = t.Points[1] - t.Points[0];
                     Vector3 v = t.Points[2] - t.Points[0];
                     t.Normal = u * v;
+                    t.Normal = Vector3.Normalize(t.Normal);
 
                     triangles.Add(t);                 
                 }

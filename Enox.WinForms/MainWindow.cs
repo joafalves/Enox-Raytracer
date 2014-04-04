@@ -141,9 +141,20 @@ namespace Enox.WinForms
 
                             Enox.Framework.Color c = Ray.Trace(myScene, r, 2);
 
-                            bmp.SetPixel(i, y, 
-                                System.Drawing.Color.FromArgb((int)(255), (int)(c.R * 255), 
-                                (int)(c.G * 255), (int)(c.B * 255)));
+                            float red = (c.R > 1 ? 1 : c.R);
+                            float green = (c.G > 1 ? 1 : c.G);
+                            float blue = (c.B > 1 ? 1 : c.B);
+
+                            try
+                            {
+                                bmp.SetPixel(i, y,
+                                    System.Drawing.Color.FromArgb((int)(255), (int)(red * 255),
+                                    (int)(green * 255), (int)(blue * 255)));
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine(ex.ToString());
+                            }
 #if DEBUG
                             if (i == 0 && y == 100)
                             {
@@ -154,7 +165,7 @@ namespace Enox.WinForms
                         }
                     }
 
-                    bmp.RotateFlip(RotateFlipType.Rotate180FlipNone);
+                    bmp.RotateFlip(RotateFlipType.Rotate180FlipX);
                     pictureBox1.Image = bmp;
                   
                     MessageBox.Show("Rendered with success", "Done");

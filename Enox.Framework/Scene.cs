@@ -77,7 +77,7 @@ namespace Enox.Framework
                         Camera camera = Camera.FromString(innerSplit[1]);
                         scene.cameras.Add(camera);
                         break;
-                    case "light":
+                    case "light": 
                         Light light = Light.FromString(innerSplit[1]);
                         scene.lights.Add(light);
                         break;
