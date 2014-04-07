@@ -14,6 +14,7 @@ using OpenTK;
 using Vector3 = Enox.Framework.Vector3;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Collections.Concurrent;
 
 namespace Enox.WinForms
 {
@@ -112,7 +113,7 @@ namespace Enox.WinForms
             if (myScene == null) return;
 
             float[] light_position = { 1.0f, 1.0f, 1.0f, 0.0f };
-            float[] light_ambient = { 0.5f, 0.5f, 0.5f, 1.0f };
+            float[] light_ambient = { myScene.Images[0].Color.R, myScene.Images[0].Color.G, myScene.Images[0].Color.B, 1.0f };
             float[] mat_specular = { 1.0f, 1.0f, 1.0f, 1.0f };
 
             GL.ShadeModel(ShadingModel.Smooth);
@@ -180,41 +181,45 @@ namespace Enox.WinForms
                     Vector3 origin = new Vector3(0, 0, myScene.Cameras[0].Distance);
 
                     int c = 0;
-                    Parallel.For(0, myScene.Images[0].Horizontal, i =>
+                    Parallel.ForEach(Partitioner.Create(0,  myScene.Images[0].Horizontal), range =>
                     {
-                        for (int y = 0; y < myScene.Images[0].Vertical; y++)
-                        //Parallel.For(0, myScene.Images[0].Vertical, y =>
+                        Console.WriteLine("BLOCK PARALLEL");
+                        for (int i = range.Item1; i < range.Item2; i++)
                         {
-                            float px = pixelSize * (i + 0.5f) - (width / 2);
-                            float py = pixelSize * (y + 0.5f) - (height / 2);
-                            Vector3 df = new Vector3(px, py, 0) - origin;
-                            Vector3 direction = Vector3.Normalize(df);
-
-                            Ray r = new Ray()
+                            for (int y = 0; y < myScene.Images[0].Vertical; y++)
+                            //Parallel.For(0, myScene.Images[0].Vertical, y =>
                             {
-                                Direction = direction,
-                                Origin = origin
-                            };
+                                float px = pixelSize * (i + 0.5f) - (width / 2);
+                                float py = pixelSize * (y + 0.5f) - (height / 2);
+                                Vector3 df = new Vector3(px, py, 0) - origin;
+                                Vector3 direction = Vector3.Normalize(df);
 
-                            Enox.Framework.Color color = Ray.Trace(myScene, r, 2);
+                                Ray r = new Ray()
+                                {
+                                    Direction = direction,
+                                    Origin = origin
+                                };
 
-                            float red = (color.R > 1 ? 1 : color.R);
-                            float green = (color.G > 1 ? 1 : color.G);
-                            float blue = (color.B > 1 ? 1 : color.B);
+                                Enox.Framework.Color color = Ray.Trace(myScene, r, 2);
 
-                            //lock (mutex)
-                            //{
-                            //    bmp.SetPixel(i, y,
-                            //        System.Drawing.Color.FromArgb((int)(255), (int)(red * 255),
-                            //        (int)(green * 255), (int)(blue * 255)));
-                            //}
+                                float red = (color.R > 1 ? 1 : color.R);
+                                float green = (color.G > 1 ? 1 : color.G);
+                                float blue = (color.B > 1 ? 1 : color.B);
 
-                            bmData[i, y] = System.Drawing.Color.FromArgb((int)(255), (int)(red * 255),
-                                            (int)(green * 255), (int)(blue * 255));
+                                //lock (mutex)
+                                //{
+                                //    bmp.SetPixel(i, y,
+                                //        System.Drawing.Color.FromArgb((int)(255), (int)(red * 255),
+                                //        (int)(green * 255), (int)(blue * 255)));
+                                //}
 
-                            c++;
-                            bgWorker.ReportProgress(c * 100 / (myScene.Images[0].Horizontal * myScene.Images[0].Vertical));
-   
+                                bmData[i, y] = System.Drawing.Color.FromArgb((int)(255), (int)(red * 255),
+                                                (int)(green * 255), (int)(blue * 255));
+
+                                c++;
+                                bgWorker.ReportProgress(c * 100 / (myScene.Images[0].Horizontal * myScene.Images[0].Vertical));
+
+                            }
                         }
                         // });
                     });
