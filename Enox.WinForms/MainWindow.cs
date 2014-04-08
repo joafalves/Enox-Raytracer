@@ -48,8 +48,8 @@ namespace Enox.WinForms
         {
             GL.PushMatrix();
             {
-                //GL.Translate(myScene.Cameras[0].Position.X, myScene.Cameras[0].Position.Y, myScene.Cameras[0].Position.Z);
-
+                GL.Translate(myScene.Cameras[0].Position.X, myScene.Cameras[0].Position.Y, myScene.Cameras[0].Position.Z);
+                GL.Translate(0, 0, myScene.Cameras[0].Distance * -1);
                 GL.Begin(PrimitiveType.Triangles);
                 {
                     foreach (Solid s in myScene.Solids)
@@ -58,6 +58,7 @@ namespace Enox.WinForms
                         {
                             Enox.Framework.Color c = myScene.Materials[t.MaterialIndex].Color;
                             GL.Color3(c.R, c.G, c.B);
+                            GL.Normal3(t.Normal.X, t.Normal.Y, t.Normal.Z);
                             foreach (Vector3 p in t.Points)
                             {
                                 GL.Vertex3(p.X, p.Y, p.Z);
@@ -78,9 +79,11 @@ namespace Enox.WinForms
             GL.Viewport(0, 0, sceneViewGLControl.ClientSize.Width, sceneViewGLControl.ClientSize.Height);
 
             float aspectRatio = (float)sceneViewGLControl.ClientSize.Width / (float)sceneViewGLControl.ClientSize.Height;
-            Matrix4 perpective = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, aspectRatio, 1, 500);
+            Matrix4 perpective = Matrix4.CreatePerspectiveFieldOfView(myScene.Cameras[0].FieldOfView / (float)(180 / Math.PI), aspectRatio, 1, 500); //
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadMatrix(ref perpective);
+
+            // MathHelper.PiOver4
 
             //GL.Ortho(-myScene.Cameras[0].Vertical, myScene.Cameras[0].Horizontal, myScene.Cameras[0].Vertical, -myScene.Cameras[0].Horizontal, 0, 100);
             //GL.Ortho(-1, 1, 1, -1, 0f, 100.0f);
@@ -112,7 +115,7 @@ namespace Enox.WinForms
         {
             if (myScene == null) return;
 
-            float[] light_position = { 1.0f, 1.0f, 1.0f, 0.0f };
+            float[] light_position = { myScene.Lights[0].Position.X, myScene.Lights[0].Position.Y, myScene.Lights[0].Position.Z, 1.0f };
             float[] light_ambient = { myScene.Image.Color.R, myScene.Image.Color.G, myScene.Image.Color.B, 1.0f };
             float[] mat_specular = { 1.0f, 1.0f, 1.0f, 1.0f };
 
@@ -127,6 +130,8 @@ namespace Enox.WinForms
             GL.Light(LightName.Light0, LightParameter.Ambient, light_ambient);
             GL.Light(LightName.Light0, LightParameter.Position, light_position);
             GL.Light(LightName.Light0, LightParameter.Diffuse, mat_specular);
+
+            GL.ClearColor(myScene.Image.Color.R, myScene.Image.Color.G, myScene.Image.Color.B, 1.0f);
         }
 
         protected override void OnLoad(EventArgs e)
@@ -183,7 +188,7 @@ namespace Enox.WinForms
                     Vector3 origin = new Vector3(0, 0, myScene.Cameras[0].Distance);
 
                     int c = 0;
-                    Parallel.ForEach(Partitioner.Create(0,  myScene.Image.Horizontal), range =>
+                    Parallel.ForEach(Partitioner.Create(0, myScene.Image.Horizontal), range =>
                     {
                         //Console.WriteLine("BLOCK PARALLEL");
                         for (int i = range.Item1; i < range.Item2; i++)
@@ -346,7 +351,7 @@ namespace Enox.WinForms
                     //Task.WaitAll(tasks.ToArray());
 
                     bmp.RotateFlip(RotateFlipType.Rotate180FlipX);
-                    pictureBox1.Image = bmp;                    
+                    pictureBox1.Image = bmp;
                 }
                 catch (Exception ex)
                 {
@@ -402,13 +407,13 @@ namespace Enox.WinForms
                 {
                     if (ofd.FileName.ToLower().EndsWith(".scx"))
                     {
-                        myScene = (Scene)Serializer.DeserializeObject(ofd.FileName);                      
+                        myScene = (Scene)Serializer.DeserializeObject(ofd.FileName);
                     }
                     else
                     {
                         myScene = Scene.FromFile(ofd.FileName);
                     }
-                   
+
                     SetScene();
                     SetViewport();
                     SetDisplayList();
@@ -432,7 +437,7 @@ namespace Enox.WinForms
             windowProgressBar.Value = 0;
 
             this.Enabled = false;
-            bgWorker.RunWorkerAsync();          
+            bgWorker.RunWorkerAsync();
         }
 
         private void toolsToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
@@ -442,7 +447,7 @@ namespace Enox.WinForms
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if(myScene == null) return;
+            if (myScene == null) return;
 
             SaveFileDialog ofd = new SaveFileDialog();
             ofd.Filter = "SceneX Files (.scx)|*.scx";

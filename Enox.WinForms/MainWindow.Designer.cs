@@ -95,7 +95,7 @@
             this.renderViewTab.Location = new System.Drawing.Point(4, 22);
             this.renderViewTab.Name = "renderViewTab";
             this.renderViewTab.Padding = new System.Windows.Forms.Padding(3);
-            this.renderViewTab.Size = new System.Drawing.Size(600, 381);
+            this.renderViewTab.Size = new System.Drawing.Size(478, 351);
             this.renderViewTab.TabIndex = 1;
             this.renderViewTab.Text = "Render View";
             this.renderViewTab.UseVisualStyleBackColor = true;
@@ -105,7 +105,7 @@
             this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pictureBox1.Location = new System.Drawing.Point(3, 3);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(594, 375);
+            this.pictureBox1.Size = new System.Drawing.Size(472, 345);
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
             // 
@@ -143,7 +143,7 @@
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.saveToolStripMenuItem.Text = "Save..";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
@@ -170,7 +170,7 @@
             // renderToolStripMenuItem
             // 
             this.renderToolStripMenuItem.Name = "renderToolStripMenuItem";
-            this.renderToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
+            this.renderToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.renderToolStripMenuItem.Text = "Render";
             this.renderToolStripMenuItem.Click += new System.EventHandler(this.renderToolStripMenuItem_Click);
             // 
@@ -228,6 +228,7 @@
             this.Name = "MainWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Ray Tracing";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.tabControl1.ResumeLayout(false);
             this.sceneViewTab.ResumeLayout(false);
             this.renderViewTab.ResumeLayout(false);
