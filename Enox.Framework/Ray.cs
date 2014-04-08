@@ -36,10 +36,6 @@ namespace Enox.Framework
 
         public static Color Trace(Scene scene, Ray r, int max)
         {
-            // stop?
-            if (max == 0) 
-                return new Color(0, 0, 0, 0);
-
             IntersectionResult tr = NearestIntersection(scene, r);
 
             if (tr.triangle != null)
@@ -86,8 +82,9 @@ namespace Enox.Framework
                         direction = rl
                     };
 
-                    c += Ray.Trace(scene, refl, --max) * scene.Materials[tr.triangle.MaterialIndex].Reflection
-                        * scene.Materials[tr.triangle.MaterialIndex].Color;
+                    c += (max > 0 ? Ray.Trace(scene, refl, --max) : new Color(0, 0, 0)) * 
+                        scene.Materials[tr.triangle.MaterialIndex].Reflection * 
+                        scene.Materials[tr.triangle.MaterialIndex].Color;
                 }
 
                 return c;               
