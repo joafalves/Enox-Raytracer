@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Enox.Framework
 {
+    [Serializable]
     public class Camera
     {
         #region fields

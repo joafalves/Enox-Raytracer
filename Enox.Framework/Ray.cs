@@ -90,7 +90,7 @@ namespace Enox.Framework
                 return c;               
             }
 
-            return scene.Images[0].Color;
+            return scene.Image.Color;
         }
 
         private static bool IsExposedToLight(Scene scene, Ray r, float dist)

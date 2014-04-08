@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Enox.Framework
 {
+    [Serializable]
     public class Triangle
     {
         #region fields
@@ -36,7 +37,5 @@ namespace Enox.Framework
         }  
 
         #endregion
-
-
     }
 }

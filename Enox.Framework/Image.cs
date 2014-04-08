@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 
 namespace Enox.Framework
 {
+    [Serializable]
+    [TypeConverter(typeof(ExpandableObjectConverter))]
     public class Image
     {
         #region field

@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Enox.Framework
 {
+    [Serializable]
     public class Vector3
     {
         #region fields

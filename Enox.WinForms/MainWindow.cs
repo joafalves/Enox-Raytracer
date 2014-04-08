@@ -113,7 +113,7 @@ namespace Enox.WinForms
             if (myScene == null) return;
 
             float[] light_position = { 1.0f, 1.0f, 1.0f, 0.0f };
-            float[] light_ambient = { myScene.Images[0].Color.R, myScene.Images[0].Color.G, myScene.Images[0].Color.B, 1.0f };
+            float[] light_ambient = { myScene.Image.Color.R, myScene.Image.Color.G, myScene.Image.Color.B, 1.0f };
             float[] mat_specular = { 1.0f, 1.0f, 1.0f, 1.0f };
 
             GL.ShadeModel(ShadingModel.Smooth);
@@ -157,6 +157,8 @@ namespace Enox.WinForms
             Console.WriteLine("elapsed: " + stopwatch.Elapsed.TotalSeconds);
 
             MessageBox.Show("Rendered with success in " + stopwatch.Elapsed.Seconds + " seconds", "Done");
+
+            this.Enabled = true;
         }
 
         void bgWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -168,25 +170,25 @@ namespace Enox.WinForms
 
                 try
                 {
-                    Bitmap bmp = new Bitmap(myScene.Images[0].Horizontal, myScene.Images[0].Vertical);
-                    System.Drawing.Color[,] bmData = new System.Drawing.Color[myScene.Images[0].Horizontal, myScene.Images[0].Vertical];
+                    Bitmap bmp = new Bitmap(myScene.Image.Horizontal, myScene.Image.Vertical);
+                    System.Drawing.Color[,] bmData = new System.Drawing.Color[myScene.Image.Horizontal, myScene.Image.Vertical];
                     //byte[] colorArray = new byte[myScene.Images[0].Horizontal * myScene.Images[0].Vertical];
 
                     float height = 2 * myScene.Cameras[0].Distance *
                                (float)Math.Tan((myScene.Cameras[0].FieldOfView * (Math.PI / 180.0f)) / 2);
-                    float width = myScene.Images[0].Horizontal / myScene.Images[0].Vertical * height;
+                    float width = myScene.Image.Horizontal / myScene.Image.Vertical * height;
 
-                    float pixelSize = width / myScene.Images[0].Horizontal;
+                    float pixelSize = width / myScene.Image.Horizontal;
 
                     Vector3 origin = new Vector3(0, 0, myScene.Cameras[0].Distance);
 
                     int c = 0;
-                    Parallel.ForEach(Partitioner.Create(0,  myScene.Images[0].Horizontal), range =>
+                    Parallel.ForEach(Partitioner.Create(0,  myScene.Image.Horizontal), range =>
                     {
-                        Console.WriteLine("BLOCK PARALLEL");
+                        //Console.WriteLine("BLOCK PARALLEL");
                         for (int i = range.Item1; i < range.Item2; i++)
                         {
-                            for (int y = 0; y < myScene.Images[0].Vertical; y++)
+                            for (int y = 0; y < myScene.Image.Vertical; y++)
                             //Parallel.For(0, myScene.Images[0].Vertical, y =>
                             {
                                 float px = pixelSize * (i + 0.5f) - (width / 2);
@@ -217,7 +219,7 @@ namespace Enox.WinForms
                                                 (int)(green * 255), (int)(blue * 255));
 
                                 c++;
-                                bgWorker.ReportProgress(c * 100 / (myScene.Images[0].Horizontal * myScene.Images[0].Vertical));
+                                bgWorker.ReportProgress(c * 100 / (myScene.Image.Horizontal * myScene.Image.Vertical));
 
                             }
                         }
@@ -225,9 +227,9 @@ namespace Enox.WinForms
                     });
 
                     // store pixel data on bitmap:
-                    for (int i = 0; i < myScene.Images[0].Horizontal; i++)
+                    for (int i = 0; i < myScene.Image.Horizontal; i++)
                     {
-                        for (int y = 0; y < myScene.Images[0].Vertical; y++)
+                        for (int y = 0; y < myScene.Image.Vertical; y++)
                         {
                             bmp.SetPixel(i, y, bmData[i, y]);
                         }
@@ -391,19 +393,29 @@ namespace Enox.WinForms
         private void loadToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = "Text Files (*.txt)|*.txt|SceneX Files (.scx)|*.scx";
             ofd.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory + "\\Content\\";
 
             if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK && ofd.FileName != string.Empty)
             {
                 try
                 {
-                    myScene = Scene.FromFile(ofd.FileName);
-
+                    if (ofd.FileName.ToLower().EndsWith(".scx"))
+                    {
+                        myScene = (Scene)Serializer.DeserializeObject(ofd.FileName);                      
+                    }
+                    else
+                    {
+                        myScene = Scene.FromFile(ofd.FileName);
+                    }
+                   
                     SetScene();
                     SetViewport();
                     SetDisplayList();
 
                     sceneViewGLControl.Invalidate();
+
+                    propertyGrid1.SelectedObject = myScene;
 
                     //MessageBox.Show("Scene loaded with success!", "Sucess!");
                 }
@@ -419,12 +431,25 @@ namespace Enox.WinForms
             windowProgressBar.Maximum = 100;
             windowProgressBar.Value = 0;
 
+            this.Enabled = false;
             bgWorker.RunWorkerAsync();          
         }
 
         private void toolsToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
         {
             renderToolStripMenuItem.Enabled = (myScene != null ? true : false);
+        }
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(myScene == null) return;
+
+            SaveFileDialog ofd = new SaveFileDialog();
+            ofd.Filter = "SceneX Files (.scx)|*.scx";
+            if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                Serializer.SerializeObject(ofd.FileName, myScene);
+            }
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Text;
 
 namespace Enox.Framework
 {
+    [Serializable]
     public class Solid
     {
         #region fields

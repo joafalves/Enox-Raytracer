@@ -6,6 +6,7 @@ using System.Text;
 
 namespace Enox.Framework
 {
+    [Serializable]
     public class Scene
     {
         #region fields
@@ -14,7 +15,7 @@ namespace Enox.Framework
         private List<Solid> solids = new List<Solid>();
         private List<Light> lights = new List<Light>();
         private List<Camera> cameras = new List<Camera>();
-        private List<Image> images = new List<Image>();
+        private Image image = new Image();
 
         #endregion
 
@@ -44,10 +45,10 @@ namespace Enox.Framework
             set { cameras = value; }
         }
 
-        public List<Image> Images
+        public Image Image
         {
-            get { return images; }
-            set { images = value; }
+            get { return image; }
+            set { image = value; }
         }
 
         #endregion
@@ -91,7 +92,7 @@ namespace Enox.Framework
                         break;
                     case "image":
                         Enox.Framework.Image image = Enox.Framework.Image.FromString(innerSplit[1]);
-                        scene.images.Add(image);
+                        scene.image = image;
                         break;
                 }
             }
