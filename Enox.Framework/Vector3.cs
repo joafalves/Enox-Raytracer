@@ -1,17 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 
 namespace Enox.Framework
 {
+    [TypeConverter(typeof(ExpandableObjectConverter))]
     [Serializable]
     public class Vector3
     {
         #region fields
 
         private static Vector3 zero = new Vector3(0f, 0f, 0f);
-        public float X, Y, Z;
+
+        public float X { get; set; }
+        public float Y { get; set; }
+        public float Z { get; set; }
 
         #endregion
 

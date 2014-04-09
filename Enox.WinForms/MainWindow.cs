@@ -30,6 +30,37 @@ namespace Enox.WinForms
         public MainWindow()
         {
             InitializeComponent();
+
+            Application.Idle += Application_Idle;
+        }
+
+        void Application_Idle(object sender, EventArgs e)
+        {
+            while (sceneViewGLControl.IsIdle && myScene != null && !bgWorker.IsBusy)
+            {
+                SetViewport();
+                Render();
+            }
+        }
+
+        void Render()
+        {
+            sceneViewGLControl.MakeCurrent();
+
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+            GL.PushMatrix();
+            {  
+                if (myScene != null)
+                {
+                    GL.Translate(myScene.Camera.Position.X, myScene.Camera.Position.Y, myScene.Camera.Position.Z);
+                    GL.Translate(0, 0, myScene.Camera.Distance * -1);
+                    GL.CallLists(displayLists[0], ListNameType.Int, displayLists); // faster
+                }
+
+                sceneViewGLControl.SwapBuffers();
+            }
+            GL.PopMatrix();
         }
 
         void SetDisplayList()
@@ -39,17 +70,15 @@ namespace Enox.WinForms
 
             GL.NewList(firstList, ListMode.Compile);
 
-            Render();
+            RenderDisplayList();
 
             GL.EndList();
         }
 
-        void Render()
+        void RenderDisplayList()
         {
             GL.PushMatrix();
             {
-                GL.Translate(myScene.Cameras[0].Position.X, myScene.Cameras[0].Position.Y, myScene.Cameras[0].Position.Z);
-                GL.Translate(0, 0, myScene.Cameras[0].Distance * -1);
                 GL.Begin(PrimitiveType.Triangles);
                 {
                     foreach (Solid s in myScene.Solids)
@@ -79,7 +108,7 @@ namespace Enox.WinForms
             GL.Viewport(0, 0, sceneViewGLControl.ClientSize.Width, sceneViewGLControl.ClientSize.Height);
 
             float aspectRatio = (float)sceneViewGLControl.ClientSize.Width / (float)sceneViewGLControl.ClientSize.Height;
-            Matrix4 perpective = Matrix4.CreatePerspectiveFieldOfView(myScene.Cameras[0].FieldOfView / (float)(180 / Math.PI), aspectRatio, 1, 500); //
+            Matrix4 perpective = Matrix4.CreatePerspectiveFieldOfView(myScene.Camera.FieldOfView * (float)(Math.PI / 180.0f), aspectRatio, 1, 500); //
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadMatrix(ref perpective);
 
@@ -108,7 +137,6 @@ namespace Enox.WinForms
 
             //GL.MatrixMode(MatrixMode.Modelview);
             //GL.LoadIdentity();
-
         }
 
         void SetScene()
@@ -179,13 +207,13 @@ namespace Enox.WinForms
                     System.Drawing.Color[,] bmData = new System.Drawing.Color[myScene.Image.Horizontal, myScene.Image.Vertical];
                     //byte[] colorArray = new byte[myScene.Images[0].Horizontal * myScene.Images[0].Vertical];
 
-                    float height = 2 * myScene.Cameras[0].Distance *
-                               (float)Math.Tan((myScene.Cameras[0].FieldOfView * (Math.PI / 180.0f)) / 2);
+                    float height = 2 * myScene.Camera.Distance *
+                               (float)Math.Tan((myScene.Camera.FieldOfView * (Math.PI / 180.0f)) / 2);
                     float width = myScene.Image.Horizontal / myScene.Image.Vertical * height;
 
                     float pixelSize = width / myScene.Image.Horizontal;
 
-                    Vector3 origin = new Vector3(0, 0, myScene.Cameras[0].Distance);
+                    Vector3 origin = new Vector3(myScene.Camera.Position.X, myScene.Camera.Position.Y, myScene.Camera.Distance);
 
                     int c = 0;
                     Parallel.ForEach(Partitioner.Create(0, myScene.Image.Horizontal), range =>
@@ -368,26 +396,7 @@ namespace Enox.WinForms
 
         void sceneViewGLControl_Paint(object sender, PaintEventArgs e)
         {
-            sceneViewGLControl.MakeCurrent();
-
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
-            //GL.LineWidth(4);
-            //GL.Begin(PrimitiveType.Lines);
-            //{
-            //    GL.Color4(1.0f, 1.0f, 1.0f, 1.0f);
-            //    GL.Vertex2(0, 0);
-            //    GL.Vertex2(0.9f, 1);
-            //}
-            //GL.End();
-
-            if (myScene != null)
-            {
-                GL.CallLists(displayLists[0], ListNameType.Int, displayLists); // faster
-                //Render();
-            }
-
-            sceneViewGLControl.SwapBuffers();
+            Render();
         }
 
         private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)

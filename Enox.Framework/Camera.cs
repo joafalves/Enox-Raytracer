@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 
 namespace Enox.Framework
 {
+    [TypeConverter(typeof(ExpandableObjectConverter))]
     [Serializable]
     public class Camera
     {

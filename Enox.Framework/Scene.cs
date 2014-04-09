@@ -14,7 +14,7 @@ namespace Enox.Framework
         private List<Material> materials = new List<Material>();
         private List<Solid> solids = new List<Solid>();
         private List<Light> lights = new List<Light>();
-        private List<Camera> cameras = new List<Camera>();
+        private Camera camera = new Camera();
         private Image image = new Image();
 
         #endregion
@@ -39,10 +39,10 @@ namespace Enox.Framework
             set { lights = value; }
         }
 
-        public List<Camera> Cameras
+        public Camera Camera
         {
-            get { return cameras; }
-            set { cameras = value; }
+            get { return camera; }
+            set { camera = value; }
         }
 
         public Image Image
@@ -76,7 +76,7 @@ namespace Enox.Framework
                 {
                     case "camera":
                         Camera camera = Camera.FromString(innerSplit[1]);
-                        scene.cameras.Add(camera);
+                        scene.camera = camera;
                         break;
                     case "light": 
                         Light light = Light.FromString(innerSplit[1]);
