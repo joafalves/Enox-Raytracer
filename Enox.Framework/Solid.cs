@@ -41,19 +41,10 @@ namespace Enox.Framework
             int c = 0;
             Triangle t = new Triangle();
             List<Triangle> triangles = new List<Triangle>();
+            Console.WriteLine("CONT: " + lines.Count());
             for (int i = 0; i < lines.Count(); i++)
             {
-                if (c > 3)
-                {
-                    c = 0;
 
-                    Vector3 u = t.Points[1] - t.Points[0];
-                    Vector3 v = t.Points[2] - t.Points[0];
-                    t.Normal = u * v;
-                    t.Normal = Vector3.Normalize(t.Normal);
-
-                    triangles.Add(t);                 
-                }
 
                 if (c == 0)
                 {
@@ -77,6 +68,18 @@ namespace Enox.Framework
                 }
 
                 c++;
+
+                if (c > 3)
+                {
+                    c = 0;
+
+                    Vector3 u = t.Points[1] - t.Points[0];
+                    Vector3 v = t.Points[2] - t.Points[0];
+                    t.Normal = u * v;
+                    t.Normal = Vector3.Normalize(t.Normal);
+
+                    triangles.Add(t);
+                }
             }
 
             return new Solid()

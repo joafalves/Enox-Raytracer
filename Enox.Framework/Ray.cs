@@ -71,7 +71,7 @@ namespace Enox.Framework
                             * scene.Materials[tr.triangle.MaterialIndex].Diffuse * cost;
                 }
 
-                // reflection
+                // reflection, material reflective?
                 if (scene.Materials[tr.triangle.MaterialIndex].Reflection > 0.0f)
                 {
                     float c1 = -tr.triangle.Normal.Dot(r.direction);
@@ -86,11 +86,49 @@ namespace Enox.Framework
                         scene.Materials[tr.triangle.MaterialIndex].Reflection * 
                         scene.Materials[tr.triangle.MaterialIndex].Color;
                 }
+                else if (scene.Materials[tr.triangle.MaterialIndex].RefractionCoef > 0.0f)
+                {
+                    Vector3 n1 = new Vector3();
+                    double m1, m2;
+                    if (RayEnters(r.direction, tr.triangle.Normal))
+                    {
+                        n1 = tr.triangle.Normal;
+                        m1 = 1.0f; // air
+                        m2 = scene.Materials[tr.triangle.MaterialIndex].RefractionIndex;
+                    }
+                    else
+                    {
+                        n1 = tr.triangle.Normal * -1;
+                        m1 = scene.Materials[tr.triangle.MaterialIndex].RefractionIndex;
+                        m2 = 1.0f;
+                    }
+
+                    double c1 = -(n1).Dot(r.direction);
+                    double m = m1 / m2;
+                    double c2 = Math.Sqrt(1 - m * m * (1 - c1 * c1));
+
+                    Vector3 rr = Vector3.Normalize((r.direction * (float)m) + n1 * (float)(m * c1 - c2));
+                    Ray refr = new Ray()
+                    {
+                        origin = tr.point,
+                        direction = rr
+                    };
+
+                    c += (max > 0 ? Ray.Trace(scene, refr, --max) : new Color(0, 0, 0)) *
+                         scene.Materials[tr.triangle.MaterialIndex].RefractionCoef  * 
+                         scene.Materials[tr.triangle.MaterialIndex].Color;
+                }
 
                 return c;               
             }
 
             return scene.Image.Color;
+        }
+
+        private static bool RayEnters(Vector3 rayN, Vector3 triN)
+        {
+            if (rayN.Dot(triN) < 0) return true;
+            return false;
         }
 
         private static bool IsExposedToLight(Scene scene, Ray r, float dist)

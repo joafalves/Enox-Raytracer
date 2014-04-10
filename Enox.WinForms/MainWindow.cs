@@ -465,5 +465,10 @@ namespace Enox.WinForms
                 Serializer.SerializeObject(ofd.FileName, myScene);
             }
         }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
     }
 }
