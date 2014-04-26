@@ -16,10 +16,17 @@ namespace Enox.Framework
         private List<Light> lights = new List<Light>();
         private Camera camera = new Camera();
         private Image image = new Image();
+        private int recursionDepth = 2;
 
         #endregion
 
         #region properties
+
+        public int RecursionDepth
+        {
+            get { return recursionDepth; }
+            set { recursionDepth = value; }
+        }
 
         public List<Material> Materials
         {

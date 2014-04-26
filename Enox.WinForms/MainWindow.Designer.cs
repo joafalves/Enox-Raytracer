@@ -45,6 +45,7 @@
             this.windowProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
+            this.saveRenderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl1.SuspendLayout();
             this.sceneViewTab.SuspendLayout();
             this.renderViewTab.SuspendLayout();
@@ -82,12 +83,19 @@
             // sceneViewGLControl
             // 
             this.sceneViewGLControl.BackColor = System.Drawing.Color.Black;
+            this.sceneViewGLControl.Cursor = System.Windows.Forms.Cursors.Arrow;
             this.sceneViewGLControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.sceneViewGLControl.Location = new System.Drawing.Point(3, 3);
             this.sceneViewGLControl.Name = "sceneViewGLControl";
             this.sceneViewGLControl.Size = new System.Drawing.Size(472, 345);
             this.sceneViewGLControl.TabIndex = 0;
             this.sceneViewGLControl.VSync = false;
+            this.sceneViewGLControl.Scroll += new System.Windows.Forms.ScrollEventHandler(this.sceneViewGLControl_Scroll);
+            this.sceneViewGLControl.KeyDown += new System.Windows.Forms.KeyEventHandler(this.sceneViewGLControl_KeyDown);
+            this.sceneViewGLControl.KeyUp += new System.Windows.Forms.KeyEventHandler(this.sceneViewGLControl_KeyUp);
+            this.sceneViewGLControl.MouseDown += new System.Windows.Forms.MouseEventHandler(this.sceneViewGLControl_MouseDown);
+            this.sceneViewGLControl.MouseMove += new System.Windows.Forms.MouseEventHandler(this.sceneViewGLControl_MouseMove);
+            this.sceneViewGLControl.MouseUp += new System.Windows.Forms.MouseEventHandler(this.sceneViewGLControl_MouseUp);
             // 
             // renderViewTab
             // 
@@ -136,33 +144,34 @@
             // loadToolStripMenuItem
             // 
             this.loadToolStripMenuItem.Name = "loadToolStripMenuItem";
-            this.loadToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.loadToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.loadToolStripMenuItem.Text = "Load Scene..";
             this.loadToolStripMenuItem.Click += new System.EventHandler(this.loadToolStripMenuItem_Click);
             // 
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.saveToolStripMenuItem.Text = "Save..";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(137, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
             // toolsToolStripMenuItem
             // 
             this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.renderToolStripMenuItem});
+            this.renderToolStripMenuItem,
+            this.saveRenderToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(51, 20);
             this.toolsToolStripMenuItem.Text = " &Tools";
@@ -171,7 +180,7 @@
             // renderToolStripMenuItem
             // 
             this.renderToolStripMenuItem.Name = "renderToolStripMenuItem";
-            this.renderToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
+            this.renderToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.renderToolStripMenuItem.Text = "Render";
             this.renderToolStripMenuItem.Click += new System.EventHandler(this.renderToolStripMenuItem_Click);
             // 
@@ -218,6 +227,13 @@
             this.propertyGrid1.Size = new System.Drawing.Size(251, 377);
             this.propertyGrid1.TabIndex = 1;
             // 
+            // saveRenderToolStripMenuItem
+            // 
+            this.saveRenderToolStripMenuItem.Name = "saveRenderToolStripMenuItem";
+            this.saveRenderToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.saveRenderToolStripMenuItem.Text = "Save Render...";
+            this.saveRenderToolStripMenuItem.Click += new System.EventHandler(this.saveRenderToolStripMenuItem_Click);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -228,7 +244,7 @@
             this.Controls.Add(this.menuStrip1);
             this.Name = "MainWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Ray Tracing";
+            this.Text = "Ray Tracing - João Alves & Ma Luoen";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.tabControl1.ResumeLayout(false);
             this.sceneViewTab.ResumeLayout(false);
@@ -266,6 +282,7 @@
         private System.Windows.Forms.ToolStripProgressBar windowProgressBar;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.PropertyGrid propertyGrid1;
+        private System.Windows.Forms.ToolStripMenuItem saveRenderToolStripMenuItem;
 
     }
 }

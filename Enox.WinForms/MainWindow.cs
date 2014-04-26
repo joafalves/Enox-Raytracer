@@ -26,12 +26,17 @@ namespace Enox.WinForms
         private object mutex = new object();
         private BackgroundWorker bgWorker = new BackgroundWorker();
         private Stopwatch stopwatch = new Stopwatch();
+        private bool rendered = false;
+        private bool mouseDown = false;
+        private Point lastMousePos;
+        private bool rotate = false;
 
         public MainWindow()
         {
             InitializeComponent();
 
             Application.Idle += Application_Idle;
+            sceneViewGLControl.MouseWheel += sceneViewGLControl_MouseWheel;
         }
 
         void Application_Idle(object sender, EventArgs e)
@@ -186,6 +191,8 @@ namespace Enox.WinForms
         {
             windowProgressBar.Value = 0;
 
+            rendered = true;
+
             stopwatch.Stop();
             Console.WriteLine("elapsed: " + stopwatch.Elapsed.TotalSeconds);
 
@@ -235,7 +242,7 @@ namespace Enox.WinForms
                                     Origin = origin
                                 };
 
-                                Enox.Framework.Color color = Ray.Trace(myScene, r, 2);
+                                Enox.Framework.Color color = Ray.Trace(myScene, r, myScene.RecursionDepth);
 
                                 float red = (color.R > 1 ? 1 : color.R);
                                 float green = (color.G > 1 ? 1 : color.G);
@@ -445,8 +452,10 @@ namespace Enox.WinForms
             windowProgressBar.Maximum = 100;
             windowProgressBar.Value = 0;
 
+            rendered = false;
             this.Enabled = false;
             bgWorker.RunWorkerAsync();
+
         }
 
         private void toolsToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
@@ -456,7 +465,11 @@ namespace Enox.WinForms
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (myScene == null) return;
+            if (myScene == null)
+            {
+                MessageBox.Show("You need to load a scene first.");
+                return;
+            }
 
             SaveFileDialog ofd = new SaveFileDialog();
             ofd.Filter = "SceneX Files (.scx)|*.scx";
@@ -469,6 +482,90 @@ namespace Enox.WinForms
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+
+        private void saveRenderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!rendered)
+            {
+                MessageBox.Show("You need to render your image first!", "");
+                return;
+            }
+
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.FileName = "";
+            sfd.DefaultExt = ".png";
+            if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                pictureBox1.Image.Save(sfd.FileName, System.Drawing.Imaging.ImageFormat.Png);
+            }           
+        }
+
+        private void sceneViewGLControl_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (myScene != null)
+            {               
+                mouseDown = true;
+                lastMousePos = e.Location;
+                Cursor = Cursors.NoMove2D;
+            }
+        }
+
+        private void sceneViewGLControl_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (mouseDown)
+            {
+                Console.WriteLine(e.X + ":" + e.Y);
+
+                if (!rotate)
+                {
+                    myScene.Camera.Position.X += (float)(e.Location.X - lastMousePos.X) / 10.0f;
+                    myScene.Camera.Position.Y += (float)(e.Location.Y - lastMousePos.Y) / 10.0f * -1;
+                }
+                else
+                {
+                    
+                }
+
+                lastMousePos = e.Location;
+            }
+        }
+
+        private void sceneViewGLControl_MouseUp(object sender, MouseEventArgs e)
+        {
+            mouseDown = false;
+            Cursor = Cursors.Default;
+        }
+
+        private void sceneViewGLControl_Scroll(object sender, ScrollEventArgs e)
+        {
+            if (myScene != null)
+            {
+                Console.WriteLine(e.NewValue);
+            }
+        }
+
+        void sceneViewGLControl_MouseWheel(object sender, MouseEventArgs e)
+        {
+            Console.WriteLine(e.Delta);
+
+            if (myScene != null)
+            {
+                myScene.Camera.Distance += (float)e.Delta / 10.0f * -1;
+            }
+        }
+
+        private void sceneViewGLControl_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.ShiftKey)
+            {
+                rotate = true;
+            }
+        }
+
+        private void sceneViewGLControl_KeyUp(object sender, KeyEventArgs e)
+        {
+            rotate = false;
         }
     }
 }
