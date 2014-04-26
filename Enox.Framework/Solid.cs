@@ -41,11 +41,9 @@ namespace Enox.Framework
             int c = 0;
             Triangle t = new Triangle();
             List<Triangle> triangles = new List<Triangle>();
-            Console.WriteLine("CONT: " + lines.Count());
+           
             for (int i = 0; i < lines.Count(); i++)
             {
-
-
                 if (c == 0)
                 {
                     t = new Triangle();
